@@ -5,9 +5,8 @@ import styles from "./PageNav.module.css";
 const PageNav = () => {
   return (
     <nav className={styles.nav}>
+      <Logo />
       <ul>
-        <Logo />
-
         <li>
           <NavLink to="/pricing">Pricing</NavLink>
         </li>
