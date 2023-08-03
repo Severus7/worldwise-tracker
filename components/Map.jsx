@@ -10,27 +10,43 @@ import {
 import styles from "./Map.module.css";
 import { useEffect, useState } from "react";
 import { useCities } from "../src/contexts/CitiesContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import Button from "./Button";
 
 const Map = () => {
   const navigate = useNavigate("form");
   const { cities } = useCities();
-
   const [mapPosition, setMapPosition] = useState([40, 0]);
-
   const [searchParams] = useSearchParams();
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    getPosition,
+  } = useGeolocation();
 
-  const lat = searchParams.get("lat");
-  const lng = searchParams.get("lng");
+  const mapLat = searchParams.get("lat");
+  const mapLng = searchParams.get("lng");
 
   useEffect(
     function () {
-      if (lat && lng) setMapPosition([lat, lng]);
+      if (mapLat && mapLng) setMapPosition([mapLat, mapLng]);
     },
-    [lat, lng]
+    [mapLat, mapLng]
+  );
+
+  useEffect(
+    function () {
+      if (geolocationPosition)
+        setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+    },
+    [geolocationPosition]
   );
 
   return (
     <div className={styles.mapContainer}>
+      <Button type="position" onClick={getPosition}>
+        {isLoadingPosition ? "Loading..." : "Use your position"}
+      </Button>
       <MapContainer
         center={mapPosition}
         zoom={6}
@@ -53,7 +69,7 @@ const Map = () => {
           </Marker>
         ))}
 
-        <ChangeCenter position={[lat || 40, lng || 0]} />
+        <ChangeCenter position={[mapLat || 40, mapLng || 0]} />
         <DetectClick />
       </MapContainer>
     </div>
